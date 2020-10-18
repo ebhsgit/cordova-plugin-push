@@ -69,10 +69,28 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
   }
 
   @Override
+  public void onNewToken(String s) {
+    super.onNewToken(s);
+    Log.e("NEW_TOKEN",s);
+  }
+
+  @Override
   public void onMessageReceived (RemoteMessage message) {
 
     String from = message.getFrom();
     Log.d(LOG_TAG, "onMessage - from: " + from);
+
+    TextSubstituteUtil.getInstance(applicationContext).updateTitle(extras);
+    TextSubstituteUtil.getInstance(applicationContext).updateMessage(extras);
+
+    MessageReceivedHook messageReceivedHook = new MessageReceivedHook(applicationContext);
+    try {
+      int notId = parseInt(NOT_ID, extras);
+      messageReceivedHook.fireEvent(extras, notId);
+    }
+    finally {
+      messageReceivedHook.dispose();
+    }
 
     Bundle extras = new Bundle();
 
