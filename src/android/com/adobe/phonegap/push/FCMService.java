@@ -80,18 +80,6 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
     String from = message.getFrom();
     Log.d(LOG_TAG, "onMessage - from: " + from);
 
-    TextSubstituteUtil.getInstance(applicationContext).updateTitle(extras);
-    TextSubstituteUtil.getInstance(applicationContext).updateMessage(extras);
-
-    MessageReceivedHook messageReceivedHook = new MessageReceivedHook(applicationContext);
-    try {
-      int notId = parseInt(NOT_ID, extras);
-      messageReceivedHook.fireEvent(extras, notId);
-    }
-    finally {
-      messageReceivedHook.dispose();
-    }
-
     Bundle extras = new Bundle();
 
     if (message.getNotification() != null) {
@@ -119,6 +107,18 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
 
       extras = normalizeExtras(applicationContext, extras, messageKey, titleKey);
 
+      TextSubstituteUtil.getInstance(applicationContext).updateTitle(extras);
+      TextSubstituteUtil.getInstance(applicationContext).updateMessage(extras);
+
+      MessageReceivedHook messageReceivedHook = new MessageReceivedHook(applicationContext);
+      try {
+        int notId = parseInt(NOT_ID, extras);
+        messageReceivedHook.fireEvent(extras, notId);
+      }
+      finally {
+        messageReceivedHook.dispose();
+      }
+      
       if (clearBadge) {
         PushPlugin.setApplicationIconBadgeNumber(getApplicationContext(), 0);
       }
